@@ -1,7 +1,7 @@
 /*
 * Josh McGrew
 * CS330 Final Project
-* Client
+* Client code for single-user hangman game
 */
 #include <stdio.h>
 #include <sys/types.h>
@@ -47,7 +47,19 @@ int client(char* server_ip, char* server_port)
 		exit(-1);
 	}
 
-	//client actions here
+	//CLIENT GAME CODE HERE
+
+	//RECEIVE instructions from server
+	//SEND game confirmation input to start the new game
+	//RECEIVE word data and guess prompt
+	//SEND letter guess
+	//repeat until guesses run out or word is completed
+	//RECEIVE end game message(s)
+	//SEND new game input (start new game or quit)
+	//new game started or quit occurs accordingly
+
+	//client should be in a loop of (1) SEND user input to server, (2) RECEIVE info from server, and (3) PRINT recieved information
+	//loop until game until user quits, then close the socket
 
 	//done
 	close(sock_fd);

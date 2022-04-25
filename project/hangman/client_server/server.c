@@ -1,7 +1,7 @@
 /*
 * Josh McGrew
 * CS330 Final Project
-* Server
+* Server code for single-user hangman game
 */
 #include <stdio.h>
 #include <sys/types.h>
@@ -11,25 +11,49 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define QUEUE_LENGTH 10
 
 //server function
 int server(char* server_port)
 {
-	//variable declaration
+	//socket variables declaration
 	int sock_fd, new_sock_fd;
 	struct addrinfo hints, * serv_info;
 	struct sockaddr_in client_addr;
 	socklen_t length;
 	int error;
 	int yes = 1;
-	
+
+	//declare hangman-related variables
+	const int HANGMAN_WORD_COUNT = 124; //124 words in hangman_words.txt
+	int counter = 0;
+	const char* fileName = "hangman_words.txt";
+	const char* words[HANGMAN_WORD_COUNT - 1];
+	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.";
+	//seed rng
+	srand(time(0));
+
 	//build address data structure
 	memset(&hints, 0, sizeof hints);
 	hint.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_FASSIVE;
+
+	//open file (hangman_words.txt) and put into words[] array
+	if (FILE* fp = fopen(fileName, "r") == NULL)
+	{
+		perror("File: could not open file");
+		exit(0);
+	}
+	while (fscanf(fp, "%s", &words[counter]) != EOF)
+	{
+		counter++;
+	}
+	//close file
+	fclose(fp);
+
 
 	error = getaddrinfo(NULL, server_port, &hints, &serv_info);
 	if (error)
@@ -82,7 +106,23 @@ int server(char* server_port)
 			exit(-1);
 		}
 
-		//game's server code here
+		//GAME CODE HERE
+
+		//note, needs to be in a loop in the future so user can play multiple games
+
+		//generate random number and assign word
+		int word_number = rand() % HANGMAN_WORD_COUNT;
+		const char word = words[word_number];
+
+		//SEND instructions to client
+		//RECEIVE client's confirmation input to start the new game
+		//SEND word data and guess prompt to client (in loop) until wrong guesses run out or word is completed
+		//RECEIVE client's guessed letter
+		//process letter and update word data
+		//SEND end of game message(s) and new game prompt
+		//RECEIVE client's new game input
+		//start new game or terminate accordingly
+
 
 		//done
 		close(new_sock_fd);
