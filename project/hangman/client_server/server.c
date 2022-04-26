@@ -28,10 +28,15 @@ int server(char* server_port)
 
 	//declare hangman-related variables
 	const int HANGMAN_WORD_COUNT = 124; //124 words in hangman_words.txt
+	const int MAX_GUESSES = 6;
 	int counter = 0;
 	const char* fileName = "hangman_words.txt";
 	const char* words[HANGMAN_WORD_COUNT - 1];
-	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.";
+	//strings to be used in the game
+	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\n";
+	const char* newGamePrompt = "Type [1] to play a new game or [0] to quit.";
+	//const char* basicPrompt = "\nGuess the next letter: ";
+	bool playAgain = true;
 	//seed rng
 	srand(time(0));
 
@@ -108,21 +113,97 @@ int server(char* server_port)
 
 		//GAME CODE HERE
 
-		//note, needs to be in a loop in the future so user can play multiple games
+		//SEND instructions and recieve response, write to playAgain bool
+		//loop won't run if player doesn't start the game
 
-		//generate random number and assign word
-		int word_number = rand() % HANGMAN_WORD_COUNT;
-		const char word = words[word_number];
+		while (playAgain)
+		{
+			//generate random number and assign new word
+			int word_number = rand() % HANGMAN_WORD_COUNT;
+			const char* word = words[word_number];
 
-		//SEND instructions to client
-		//RECEIVE client's confirmation input to start the new game
-		//SEND word data and guess prompt to client (in loop) until wrong guesses run out or word is completed
-		//RECEIVE client's guessed letter
-		//process letter and update word data
-		//SEND end of game message(s) and new game prompt
-		//RECEIVE client's new game input
-		//start new game or terminate accordingly
+			int wordLength = 0;
+			int guesses = MAX_GUESSES; //guesses remaining
+			char lettersGuessed[32]; //keep track of guessed letters
+			char letter; //the guessed letter
+			char wordInProgress[16]; //for the in-progress word, it's reset each time the loop runs
 
+			//find length of the word
+			for (wordLength = 0; word[wordLength] != '\0'; wordLength++) {}
+			//Initial SEND wordLength to client, may not need?
+
+			memset(wordInProgress, 0, sizeof(wordInProgress));
+			memset(lettersGuessed, 0, sizeof(lettersGuessed));
+			//intitialize wordInProgress to blank lines for the word length
+			for (int i = 0; i < wordLength; i++)
+			{
+				wordInProgress[i] = '-';
+			}
+
+			//enter the guesses loop
+			while (true)
+			{
+				//SEND information to client, client will build the prompt from there
+				//Sending 'guesses' for guesses remaining
+				//Sending 'lettersGuessed' for already guessed letters
+				//Sending 'wordInProgress' to be displayed
+
+				//RECEIVE the letter and store it in 'letter'
+				//check if letter has already been guessed
+				if (strchr(lettersGuessed, letter) != NULL)
+				{
+					//letter has been guessed already
+					//SEND info that the letter has been guessed already (info1 = 1)
+					//this guess loop is over
+				}
+				else
+				{
+					//SEND info that the letter hasn't been guessed yet (info1 = 0)
+
+					//if time permits, check here if character is valid (lowercase letter only)
+					//if it isn't valid, end the guess
+					
+					//check if letter is in the word
+					if (strchr(word, letter) != NULL)
+					{
+						//letter is in the word
+						//SEND info that guess is correct (info2 = 0)
+						//build  display word with new letter(s) in it Ex: "_ E _ _ _"
+						//iterate over the word:
+						//if the guessed letter is there, place the letter in the corresponding spot in 'wordinProgress'
+
+					}
+					else
+					{
+						//letter is not in the word, decrement guesses
+						guesses--;
+						//SEND info that guess is incorrect (info2 = 1)
+					}
+
+					//guess complete, check if guesses have run out
+					if (guesses <= 0)
+					{
+						//SEND info that game is over (lost) (info3 = 2)
+						break;
+					}
+					//also check if word is completed
+					//strcmp??
+					if (strcmp(wordInProgress, word) == 0) //may not work?
+					{
+						//word is completed.
+						//SEND info that game is over (won) (info3 = 1)
+						break;
+					}
+
+					//SEND info that game is not over (info3 = 0)
+				}
+
+			}
+			//current game is over
+			//SEND word to client for reveal
+			//RECEIVE play again response (1 sets playAgain to true, 0 sets playAgain to false)
+			//loop will end if player decides not to play again
+		}
 
 		//done
 		close(new_sock_fd);

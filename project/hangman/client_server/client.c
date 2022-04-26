@@ -23,6 +23,9 @@ int client(char* server_ip, char* server_port)
 	int yes = 1;
 	char* status;
 
+	//hangman variables
+	bool playAgainInput = true;
+
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -49,17 +52,93 @@ int client(char* server_ip, char* server_port)
 
 	//CLIENT GAME CODE HERE
 
-	//RECEIVE instructions from server
-	//SEND game confirmation input to start the new game
-	//RECEIVE word data and guess prompt
-	//SEND letter guess
-	//repeat until guesses run out or word is completed
-	//RECEIVE end game message(s)
-	//SEND new game input (start new game or quit)
-	//new game started or quit occurs accordingly
+	//RECEIVE instructions from server and print
+	//enter game loop
+	while (playAgainInput)
+	{
+		int wordLength = 0;
+		int guesses = 0;
+		char lettersGuessed[32];
+		char wordInProgress[16];
+		char word[16];
+		char letter; //the guessed letter
+		//info variables
+		int info1 = 0;
+		int info2 = 0;
+		int info3 = 0;
+		
+		//empty the strings
+		memset(wordInProgress, 0, sizeof(wordInProgress));
+		memset(lettersGuessed, 0, sizeof(lettersGuessed));
+		memset(word, 0, sizeof(word));
 
-	//client should be in a loop of (1) SEND user input to server, (2) RECEIVE info from server, and (3) PRINT recieved information
-	//loop until game until user quits, then close the socket
+
+		//RECEIVE wordlength
+
+		//enter secondary loop (guesses)
+		while (true)
+		{
+			//RECEIVE information:
+			//Receiving 'guesses' to display guesses remaining
+			//Receiving 'lettersGuessed' for already guessed letters
+			//Receiving 'wordInProgress' to display	
+
+			//print the guess prompt
+			printf("***\nWrong Guesses Remaining: %i\n", guesses);
+			printf("You have already guessed: %s\n", lettersGuessed);
+			printf("Word: %s\n", wordInProgress);
+			printf("Guess the next letter: ");
+			//get input and store in 'letter'
+			//SEND the letter to the server
+
+			//next the client receives information.
+			//info1 refers to if the letter has been guessed already.
+			//note that info2 and info3 are bypassed if info1 indicates that a letter has been guessed already
+			
+			//RECEIVE info1 (0 indicates letter that hasn't been guessed, 1 indicates letter has been guessed.)
+			if (info1 == 1)
+			{
+				//this guess is over
+				printf("\n%c has been guessed already.", letter);
+			}
+			else
+			{
+				//server now processes the guess.
+				//next, info2 refers to whether the guess is correct (0) or incorrect (1)
+				//RECEIVE info2
+				if (info2 == 0)
+				{
+					printf("\nThat guess is correct!");
+				}
+				else
+				{
+					printf("%c is not in the word. You have lost a guess!", letter);
+				}
+
+				//info3 has 3 possible values:
+				//game is not over (0) (nothing is printed in this case)
+				//game is over and player won (1)
+				//game is over and player lost (2)
+				//RECEIVE info3
+				if (info3 == 1)
+				{
+					printf("\nYou have guessed the word!");
+					break;
+				}
+				else if (info3 == 2)
+				{
+					printf("\nYou have run out of guesses! You could not guess the word!");
+					break;
+				}
+				//loops back if break does not occur
+			}
+		}
+		//RECEIVE word from server and reveal it (regardless of whether you won or lost)
+		printf("\nGame Over! The word was: %s", word);
+		printf("\nWould you like to play again? (1: Yes, 0: No)");
+		//get input to playAgainInput
+		//SEND playAgain response, playAgain also determines if client loops again too
+	}
 
 	//done
 	close(sock_fd);
