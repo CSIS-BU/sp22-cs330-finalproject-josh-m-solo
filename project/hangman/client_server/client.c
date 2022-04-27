@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#define BUFFER_SIZE 1024
+
 //client function
 int client(char* server_ip, char* server_port)
 {
@@ -19,6 +21,7 @@ int client(char* server_ip, char* server_port)
 	int sock_fd; //file descriptor
 	struct addrinfo hints, * server_info, * p;
 	socklen_t sin_size;
+	char buffer[BUFFER_SIZE];
 	int error;
 	int yes = 1;
 	char* status;
@@ -50,13 +53,21 @@ int client(char* server_ip, char* server_port)
 		perror("Client: connect");
 		exit(-1);
 	}
+	printf("CLIENT: I am connected.\n");
 
 	//CLIENT GAME CODE HERE
 
 	//RECEIVE instructions from server and print
+	char recc[263] = "test.";
+	if (recv(sock_fd, recc, sizeof(recc), 0) < 0)
+	{
+		perror("Client: receive failed (instructions)");
+	}
+	printf("CLIENT: I received data: %s", recc);
 	//enter game loop
 	while (playAgainInput == 1)
 	{
+		break;
 		int wordLength = 0;
 		int guesses = 0;
 		char lettersGuessed[32];

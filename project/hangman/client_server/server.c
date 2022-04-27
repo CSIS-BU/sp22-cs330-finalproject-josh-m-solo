@@ -37,7 +37,7 @@ int server(char* server_port)
 	//const char* words[HANGMAN_WORD_COUNT - 1];
 	const char* words[] = { "birthday", "camera", "challenge", "creation", "database", "emotion", "energy", "foundation", "generator", "hardware", "homework", "inspector", "jacket", "kingdom", "library", "manager", "morning", "nightmare", "office", "packet", "payment", "protocol", "resources", "router", "science", "session", "software", "switch", "technology", "thunder", "vehicle", "winter", "yogurt" };
 	//strings to be used in the game
-	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\nType [1] to play a new game or [0] to quit.";
+	char instructions[263] = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\nType [1] to play a new game or [0] to quit.";
 	//const char* basicPrompt = "\nGuess the next letter: ";
 	int playAgain = 1;
 	//seed rng
@@ -101,7 +101,6 @@ int server(char* server_port)
 		perror("Server: listen error");
 		exit(-1);
 	}
-
 	//wait for connection
 	while (1)
 	{
@@ -112,14 +111,18 @@ int server(char* server_port)
 			perror("Server: accept error");
 			exit(-1);
 		}
+		printf("SERVER: I AM CONNECTED. ABOUT TO SEND.\n");
 
 		//GAME CODE HERE
 
 		//SEND instructions
-		if (send(sock_fd, instructions, sizeof(instructions), 0) < 0)
-		{
-			perror("Server: send failed (instructions)");
-		}
+		//if (send(sock_fd, instructions, sizeof(instructions), 0) < 0)
+		//{
+		//	perror("Server: send failed (instructions)");
+		//}
+		send(sock_fd, instructions, sizeof(instructions), 0);
+		printf("SERVER: SENT\n");
+		break;
 		//RECEIVE integer response to start new game
 		if (recv(sock_fd, buffer, sizeof(playAgain), 0) < 0)
 		{
