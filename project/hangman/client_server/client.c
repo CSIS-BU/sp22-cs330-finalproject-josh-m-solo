@@ -85,7 +85,7 @@ int client(char* server_ip, char* server_port)
 			//Receiving 'wordInProgress' to display	
 
 			//print the guess prompt
-			printf("***\nWrong Guesses Remaining: %i\n", guesses);
+			printf("\n\n***\nWrong Guesses Remaining: %i\n", guesses);
 			printf("You have already guessed: %s\n", lettersGuessed);
 			printf("Word: %s\n", wordInProgress);
 			printf("Guess the next letter: ");

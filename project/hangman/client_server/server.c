@@ -14,11 +14,13 @@
 #include <time.h>
 
 #define QUEUE_LENGTH 10
+#define BUFFER_SIZE 32
 
 //server function
 int server(char* server_port)
 {
 	//socket variables declaration
+	char buffer[BUFFER_SIZE];
 	int sock_fd, new_sock_fd;
 	struct addrinfo hints, * serv_info;
 	struct sockaddr_in client_addr;
@@ -28,14 +30,14 @@ int server(char* server_port)
 	FILE* fp;
 
 	//declare hangman-related variables
-	const int HANGMAN_WORD_COUNT = 124; //124 words in hangman_words.txt
+	const int HANGMAN_WORD_COUNT = 34; //34 words in test, 124 words in hangman_words.txt
 	const int MAX_GUESSES = 6;
 	//int counter = 0;
-	const char* fileName = "hangman_words.txt";
-	const char* words[HANGMAN_WORD_COUNT - 1];
+	//const char* fileName = "hangman_words.txt";
+	//const char* words[HANGMAN_WORD_COUNT - 1];
+	const char* words[] = { "birthday", "camera", "challenge", "creation", "database", "emotion", "energy", "foundation", "generator", "hardware", "homework", "inspector", "jacket", "kingdom", "library", "manager", "morning", "nightmare", "office", "packet", "payment", "protocol", "resources", "router", "science", "session", "software", "switch", "technology", "thunder", "vehicle", "winter", "yogurt" };
 	//strings to be used in the game
-	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\n";
-	const char* newGamePrompt = "Type [1] to play a new game or [0] to quit.";
+	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\nType [1] to play a new game or [0] to quit.";
 	//const char* basicPrompt = "\nGuess the next letter: ";
 	int playAgain = 1;
 	//seed rng
@@ -48,14 +50,14 @@ int server(char* server_port)
 	hints.ai_flags = AI_PASSIVE;
 
 	//open file (hangman_words.txt) and put into words[] array
-	fp = fopen(fileName, "r");
+	//fp = fopen(fileName, "r");
 	//fread(words, 16, 1, fp);
 	//while (fscanf(fp, "%s", words[counter]) != EOF)
 	//{
 	//	counter++;
 	//}
 	//close file
-	fclose(fp);
+	//fclose(fp);
 
 
 	error = getaddrinfo(NULL, server_port, &hints, &serv_info);
@@ -103,6 +105,7 @@ int server(char* server_port)
 	//wait for connection
 	while (1)
 	{
+		memset(buffer, 0, sizeof(buffer));
 		length = sizeof client_addr;
 		if ((new_sock_fd = accept(sock_fd, (struct sockaddr*)&client_addr, &length)) < 0)
 		{
@@ -112,7 +115,19 @@ int server(char* server_port)
 
 		//GAME CODE HERE
 
-		//SEND instructions and recieve response, write to playAgain bool
+		//SEND instructions
+		if (send(sock_fd, instructions, sizeof(instructions), 0) < 0)
+		{
+			perror("Server: send failed (instructions)");
+		}
+		//RECEIVE integer response to start new game
+		if (recv(sock_fd, buffer, sizeof(playAgain), 0) < 0)
+		{
+			perror("Server: receive failed (response to instructions)");
+		}
+		playAgain = buffer[0];
+		memset(buffer, 0, sizeof(buffer));
+		
 		//loop won't run if player doesn't start the game
 
 		while (playAgain == 1)
@@ -138,6 +153,7 @@ int server(char* server_port)
 			{
 				wordInProgress[i] = '-';
 			}
+			//note, word selection, word length, and word in progress are all functional
 
 			//enter the guesses loop
 			while (1)
@@ -168,9 +184,13 @@ int server(char* server_port)
 						//letter is in the word
 						//SEND info that guess is correct (info2 = 0)
 						//build  display word with new letter(s) in it Ex: "_ E _ _ _"
-						//iterate over the word:
-						//if the guessed letter is there, place the letter in the corresponding spot in 'wordinProgress'
-
+						for (int j = 0; j < wordLength; j++)
+						{
+							if (word[j] == letter)
+							{
+								wordInProgress[j] = letter;
+							}
+						}
 					}
 					else
 					{
@@ -202,6 +222,7 @@ int server(char* server_port)
 			//SEND word to client for reveal
 			//RECEIVE play again response (1 sets playAgain to true, 0 sets playAgain to false)
 			//loop will end if player decides not to play again
+			break;
 		}
 
 		//done
