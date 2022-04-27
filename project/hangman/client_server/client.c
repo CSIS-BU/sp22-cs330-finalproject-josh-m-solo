@@ -24,7 +24,7 @@ int client(char* server_ip, char* server_port)
 	char* status;
 
 	//hangman variables
-	bool playAgainInput = true;
+	int playAgainInput = 1;
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -33,20 +33,21 @@ int client(char* server_ip, char* server_port)
 	error = getaddrinfo(server_ip, server_port, &hints, &server_info);
 	if (error)
 	{
-		errx(1, "&s", gai_strerror(error));
+		//errx(1, "&s", gai_strerror(error));
+		perror("Client: connect");
 	}
 
 	//create socket
 	if ((sock_fd = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol)) < 0)
 	{
-		perror("Server: socket");
+		perror("Client: socket");
 		exit(-1);
 	}
 
 	//connect to server
 	if (connect(sock_fd, server_info->ai_addr, server_info->ai_addrlen) < 0)
 	{
-		perror("Server: connect");
+		perror("Client: connect");
 		exit(-1);
 	}
 
@@ -54,7 +55,7 @@ int client(char* server_ip, char* server_port)
 
 	//RECEIVE instructions from server and print
 	//enter game loop
-	while (playAgainInput)
+	while (playAgainInput == 1)
 	{
 		int wordLength = 0;
 		int guesses = 0;
@@ -76,7 +77,7 @@ int client(char* server_ip, char* server_port)
 		//RECEIVE wordlength
 
 		//enter secondary loop (guesses)
-		while (true)
+		while (1)
 		{
 			//RECEIVE information:
 			//Receiving 'guesses' to display guesses remaining

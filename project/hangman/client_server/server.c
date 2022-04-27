@@ -25,37 +25,35 @@ int server(char* server_port)
 	socklen_t length;
 	int error;
 	int yes = 1;
+	FILE* fp;
 
 	//declare hangman-related variables
 	const int HANGMAN_WORD_COUNT = 124; //124 words in hangman_words.txt
 	const int MAX_GUESSES = 6;
-	int counter = 0;
+	//int counter = 0;
 	const char* fileName = "hangman_words.txt";
 	const char* words[HANGMAN_WORD_COUNT - 1];
 	//strings to be used in the game
 	const char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\n";
 	const char* newGamePrompt = "Type [1] to play a new game or [0] to quit.";
 	//const char* basicPrompt = "\nGuess the next letter: ";
-	bool playAgain = true;
+	int playAgain = 1;
 	//seed rng
 	srand(time(0));
 
 	//build address data structure
 	memset(&hints, 0, sizeof hints);
-	hint.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_FASSIVE;
+	hints.ai_flags = AI_PASSIVE;
 
 	//open file (hangman_words.txt) and put into words[] array
-	if (FILE* fp = fopen(fileName, "r") == NULL)
-	{
-		perror("File: could not open file");
-		exit(0);
-	}
-	while (fscanf(fp, "%s", &words[counter]) != EOF)
-	{
-		counter++;
-	}
+	fp = fopen(fileName, "r");
+	//fread(words, 16, 1, fp);
+	//while (fscanf(fp, "%s", words[counter]) != EOF)
+	//{
+	//	counter++;
+	//}
 	//close file
 	fclose(fp);
 
@@ -63,7 +61,8 @@ int server(char* server_port)
 	error = getaddrinfo(NULL, server_port, &hints, &serv_info);
 	if (error)
 	{
-		errx(1, "%s", gai_strerror(error));
+		//errx(1, "%s", gai_strerror(error));
+		perror("Server: getaddrinfo");
 	}
 
 	//create socket
@@ -116,7 +115,7 @@ int server(char* server_port)
 		//SEND instructions and recieve response, write to playAgain bool
 		//loop won't run if player doesn't start the game
 
-		while (playAgain)
+		while (playAgain == 1)
 		{
 			//generate random number and assign new word
 			int word_number = rand() % HANGMAN_WORD_COUNT;
@@ -141,7 +140,7 @@ int server(char* server_port)
 			}
 
 			//enter the guesses loop
-			while (true)
+			while (1)
 			{
 				//SEND information to client, client will build the prompt from there
 				//Sending 'guesses' for guesses remaining
