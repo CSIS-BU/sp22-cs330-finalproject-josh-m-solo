@@ -14,13 +14,13 @@
 #include <time.h>
 
 #define QUEUE_LENGTH 10
-#define BUFFER_SIZE 32
+#define BUFFER_SIZE 2048
 
 //server function
 int server(char* server_port)
 {
 	//socket variables declaration
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE] = { 0 };
 	int sock_fd, new_sock_fd;
 	struct addrinfo hints, * serv_info;
 	struct sockaddr_in client_addr;
@@ -37,8 +37,7 @@ int server(char* server_port)
 	//const char* words[HANGMAN_WORD_COUNT - 1];
 	const char* words[] = { "birthday", "camera", "challenge", "creation", "database", "emotion", "energy", "foundation", "generator", "hardware", "homework", "inspector", "jacket", "kingdom", "library", "manager", "morning", "nightmare", "office", "packet", "payment", "protocol", "resources", "router", "science", "session", "software", "switch", "technology", "thunder", "vehicle", "winter", "yogurt" };
 	//strings to be used in the game
-	char instructions[263] = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\nType [1] to play a new game or [0] to quit.";
-	//const char* basicPrompt = "\nGuess the next letter: ";
+	char* instructions = "Welcome to Hangman, a word guessing game.\nEach game, a new word will be chosen and you must guess letters in the word one at a time.\nYou lose if you guess incorrectly 6 times.\nYou win if you guess the entire word.\n\nType [1] to play a new game or [0] to quit.";
 	int playAgain = 1;
 	//seed rng
 	srand(time(0));
@@ -116,11 +115,10 @@ int server(char* server_port)
 		//GAME CODE HERE
 
 		//SEND instructions
-		//if (send(sock_fd, instructions, sizeof(instructions), 0) < 0)
-		//{
-		//	perror("Server: send failed (instructions)");
-		//}
-		send(sock_fd, instructions, sizeof(instructions), 0);
+		if (send(new_sock_fd, instructions, strlen(instructions), 0) < 0)
+		{
+			perror("Server: send failed (instructions)");
+		}
 		printf("SERVER: SENT\n");
 		break;
 		//RECEIVE integer response to start new game
