@@ -106,6 +106,7 @@ int client(char* server_ip, char* server_port)
 
 		//CLIENT GAME CODE HERE
 
+		memset(buffer, 0, sizeof(buffer));
 		//receive the word from the server
 		if (recv(sock_fd, buffer, BUFFER_SIZE, 0) < 0)
 		{

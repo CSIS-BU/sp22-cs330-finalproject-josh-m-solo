@@ -30,8 +30,8 @@ int server(char* server_port)
 	int buf_len;
 
 	//declare hangman related variables
-	const int HANGMAN_WORD_COUNT = 34;
-	const char* words[] = { "birthday", "camera", "challenge", "creation", "database", "emotion", "energy", "foundation", "generator", "hardware", "homework", "inspector", "jacket", "kingdom", "library", "manager", "morning", "nightmare", "office", "packet", "payment", "protocol", "resources", "router", "science", "session", "software", "switch", "technology", "thunder", "vehicle", "winter", "yogurt" };
+	const int HANGMAN_WORD_COUNT = 124;
+	const char* words[] = { "activity", "amulet", "apple", "argument", "armor", "barbell", "basket", "battleship", "birthday", "blade", "border", "cabinet", "camera", "category", "chains", "challenge", "character", "classroom", "cleaver", "client", "complaint", "confusion", "context", "cookie", "creation", "customer", "database", "developer", "disaster", "drone", "elevator", "emotion", "emphasis", "energy", "estate", "extras", "fireball", "flagpole", "flasks", "fork", "foundation", "furnace", "generator", "hammer", "hardware", "headband", "health", "helmet", "highway", "homework", "honey", "houses", "industry", "insect", "inspector", "jacket", "kingdom", "ladder", "lampshade", "language", "library", "lightning", "longsword", "luncheon", "manager", "medicine", "memory", "midnight", "morning", "network", "newspaper", "nightfall", "nightmare", "office", "orange", "packet", "passion", "pasta", "pauldron", "payment", "pencil", "phone", "pizza", "platform", "potato", "potion", "potion", "program", "project", "protector", "protocol", "quest", "realm", "republic", "resources", "revolution", "river", "router", "sacrifice", "science", "secret", "servant", "server", "session", "signature", "socket", "software", "statement", "steak", "strategy", "summer", "support", "switch", "technology", "texture", "thoughtful", "thunder", "university", "vehicle", "vengeance", "waterfall", "winter", "writing", "yogurt", "zoology" };
 	
 	srand(time(0));
 
